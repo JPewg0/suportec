@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Support++</string>
+    <string name="emial">joaoninguem@gmail.com</string>
+    <string name="senha">**************</string>
+    <string name="Login">Login</string>
+    <string name="recuperar_senha">Recuperar senha</string>
+    <string name="cadastre_se">Casdastre-se</string>
+    <string name="TXTsenha">Senha</string>
+    <string name="ticAetndimento">Ticket de Atendimento</string>
+    <string name="empresa">Empresa</string>
+    <string name="motivoTicket">Digite o motivo para gerar o ticket</string>
+    <string name="Motivo">Motivo</string>
+    <string name="gTicket">Gerar Ticket</string>
+    <string name="NomeC">Nome Completo</string>
+    <string name="emailC">E-mail</string>
+    <string name="senhaC">Senha</string>
+    <string name="senha_conf">Confirmar Senha</string>
+    <string name="codigo_Empresa">Codigo da Empresa </string>
+    <string name="NomeA">Nome Completo</string>
+    <string name="emailA">E-mail</string>
+    <string name="senhaA">Senha</string>
+    <string name="mudarSenha">Mudar a senha</string>
+    <string name="cancelarConta">Cancelar a conta</string>
+    <string name="salvarMudanca">Salvar</string>
+    <string-array name="company_array">
+        <item>Select Company</item>
+        <item>Company A</item>
+        <item>Company B</item>
+        <item>Company C</item>
+    </string-array>
+</resources>
