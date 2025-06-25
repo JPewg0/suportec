@@ -21,20 +21,20 @@
         tools:layout_editor_absoluteY="132dp" />
 
     <ListView
-        android:id="@+id/ticketsList"
+        android:id="@+id/listViewTickets"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:background="@color/grey"
-        app:layout_constraintBottom_toTopOf="@id/solicitacao"
+        app:layout_constraintBottom_toTopOf="@id/SolicitarA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewMyTickets"
         tools:listitem="@layout/list_item_cliente_ticket" />
 
     <Button
-        android:id="@+id/solicitacao"
+        android:id="@+id/SolicitarA"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -48,7 +48,7 @@
         android:id="@+id/buttonLogout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="@color/red"
         android:text="Deslogar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

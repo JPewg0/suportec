@@ -5,41 +5,46 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_grey"
+    android:background="@drawable/_7e56c3c_e176_4f7c_881d_3641e5b1222c"
     android:padding="16dp"
     tools:context=".Recuperar_senha">
 
-    <ImageView
-        android:id="@+id/cabecario"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:src="@drawable/logo"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Logo" />
+    <TextView
+        android:id="@+id/textView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/candal"
+        android:text="Suportec"
+        android:textColor="@color/blue_suportec"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textViewInstructions"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:gravity="center"
-        android:text="Digite seu e-mail para receber o link de recuperação de senha."
-        android:textColor="@color/white"
-        android:textSize="18sp"
+        android:text="DIgite seu email"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cabecario" />
+        tools:layout_editor_absoluteY="207dp" />
 
     <TextView
         android:id="@+id/emailCTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="44dp"
         android:text="E-mail"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewInstructions" />
@@ -49,26 +54,27 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
-        android:background="@color/grey"
+        android:background="@color/light_grey"
         android:hint="seuemail@exemplo.com"
         android:inputType="textEmailAddress"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:textColor="@color/white"
-        android:textColorHint="@color/light_grey"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailCTV" />
 
     <Button
         android:id="@+id/salvar"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="@color/grey"
-        android:text="Enviar E-mail"
+        android:layout_width="376dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="264dp"
+        android:backgroundTint="@color/blue"
+        android:text="Enviar solicitação"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailETC" />
 

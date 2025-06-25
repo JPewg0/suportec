@@ -13,11 +13,12 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/ts7vuoswhwf41"
         app:layout_constraintBottom_toTopOf="@id/layoutChatMessageInput"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_chat_message_sent"/> <!-- Example list item -->
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/item_chat_message_sent" /> <!-- Example list item -->
 
     <LinearLayout
         android:id="@+id/layoutChatMessageInput"
@@ -43,9 +44,10 @@
 
         <Button
             android:id="@+id/buttonSendMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="41dp"
             android:layout_height="wrap_content"
-            android:text="Enviar"/>
+            android:backgroundTint="@color/blue"
+            android:foreground="@android:drawable/ic_menu_send" />
     </LinearLayout>
 
     <ProgressBar
