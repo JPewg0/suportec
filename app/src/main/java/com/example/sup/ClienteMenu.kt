@@ -12,23 +12,30 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class ClienteMenu : AppCompatActivity() {
-    private lateinit var solicitarAtendimentoBT: Button
-    private lateinit var logoutBT: Button
-    private lateinit var cabecarioIV: ImageView
-    private lateinit var ticketsListView: ListView
+    // Variáveis que agora correspondem aos IDs do XML
+    private lateinit var novoChamadoButton: Button // Antigo: solicitarAtendimentoBT
+    private lateinit var deslogarButton: Button // Antigo: logoutBT
+    private lateinit var cabecalhoImageView: ImageView // Antigo: cabecarioIV (não existe no XML fornecido)
+    private lateinit var listaChamadosListView: ListView // Antigo: ticketsListView
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
     private lateinit var ticketsAdapter: ClienteTicketAdapter
+
     private val ticketList = mutableListOf<SupportItem>()
 
     private val TAG = "ClienteMenu"
@@ -38,89 +45,102 @@ class ClienteMenu : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_cliente_menu)
 
+        // Inicialização de instâncias Firebase
         auth = Firebase.auth
         db = Firebase.firestore
 
-        solicitarAtendimentoBT = findViewById(R.id.SolicitarA)
-        logoutBT = findViewById(R.id.buttonLogout)
-        cabecarioIV = findViewById(R.id.cabecario)
-        ticketsListView = findViewById(R.id.listViewTickets)
+        // Vinculação de elementos da interface
+        novoChamadoButton = findViewById(R.id.solicitacao)
+        deslogarButton = findViewById(R.id.buttonLogout)
+        listaChamadosListView = findViewById(R.id.ticketsList)
 
+        // Configuração do adaptador para a lista de chamados
         ticketsAdapter = ClienteTicketAdapter(this, ticketList)
-        ticketsListView.adapter = ticketsAdapter
+        listaChamadosListView.adapter = ticketsAdapter
 
-        val mainLayout = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.main)
-        ViewCompat.setOnApplyWindowInsetsListener(mainLayout) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+        // Ajuste de insets da janela para barras do sistema
+        val mainContainer = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.main)
+        ViewCompat.setOnApplyWindowInsetsListener(mainContainer) { view, insets ->
+            val systemWindowBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemWindowBars.left, systemWindowBars.top, systemWindowBars.right, systemWindowBars.bottom)
             insets
         }
 
-        cabecarioIV.setOnClickListener {
-            startActivity(Intent(this, Dados_da_conta::class.java))
+        // Definição dos ouvintes de clique
+        novoChamadoButton.setOnClickListener {
+            val launchIntent = Intent(this, GeradorTicket::class.java)
+            startActivity(launchIntent)
         }
 
-        solicitarAtendimentoBT.setOnClickListener {
-            startActivity(Intent(this, GeradorTicket::class.java))
-        }
-
-        logoutBT.setOnClickListener {
+        deslogarButton.setOnClickListener {
             auth.signOut()
-            val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            val logoutIntent = Intent(this, MainActivity::class.java)
+            logoutIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(logoutIntent)
             finish()
         }
 
-        ticketsListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+        // Configuração do ouvinte de clique para itens da lista
+        listaChamadosListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val selectedTicket = ticketList[position]
             if (selectedTicket.id.isNotEmpty()) {
-                val intent = Intent(this, Chat::class.java)
-                intent.putExtra("TICKET_ID", selectedTicket.id)
-                startActivity(intent)
+                val chatIntent = Intent(this, Chat::class.java)
+                chatIntent.putExtra("TICKET_ID", selectedTicket.id)
+                startActivity(chatIntent)
             } else {
                 Toast.makeText(this, "ID do chamado inválido.", Toast.LENGTH_SHORT).show()
             }
         }
 
-        loadUserTickets()
+        // Carregamento inicial dos tickets do usuário
+        loadTickets()
     }
 
     override fun onResume() {
         super.onResume()
-        // Recarrega os chamados sempre que a tela se torna visível
-        loadUserTickets()
+        loadTickets()
     }
 
-    private fun loadUserTickets() {
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            // Se não houver utilizador, limpa a lista e não faz nada
+    private fun loadTickets() {
+        val loggedInUser = auth.currentUser
+        if (loggedInUser == null) {
             ticketList.clear()
             ticketsAdapter.notifyDataSetChanged()
             return
         }
 
-        val userId = currentUser.uid
-        db.collection("supportTickets")
-            .whereEqualTo("userId", userId)
-            .orderBy("createdAt", Query.Direction.DESCENDING) // Mostra os mais recentes primeiro
-            .get()
-            .addOnSuccessListener { documents ->
-                ticketList.clear() // Limpa a lista antes de adicionar novos itens
-                if (documents.isEmpty) {
-                    Log.d(TAG, "Nenhum chamado encontrado para este utilizador.")
-                } else {
-                    for (document in documents) {
-                        val item = document.toObject(SupportItem::class.java).copy(id = document.id)
-                        ticketList.add(item)
+        val currentUserId = loggedInUser.uid
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val fetchedDocuments = db.collection("supportTickets")
+                    .whereEqualTo("userId", currentUserId)
+                    .orderBy("createdAt", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                withContext(Dispatchers.Main) {
+                    ticketList.clear()
+                    if (fetchedDocuments.isEmpty) {
+                        Log.d(TAG, "Não foram encontrados registros de suporte para o usuário atual.")
+                    } else {
+                        for (doc in fetchedDocuments) {
+                            try {
+                                val supportEntry = doc.toObject(SupportItem::class.java).copy(id = doc.id)
+                                supportEntry?.let { ticketList.add(it) }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "Falha ao converter documento para SupportItem: ${doc.id}", e)
+                            }
+                        }
                     }
+                    ticketsAdapter.notifyDataSetChanged()
                 }
-                ticketsAdapter.notifyDataSetChanged() // Notifica o adapter que os dados mudaram
+            } catch (operationFailed: Exception) {
+                Log.e(TAG, "Erro ao obter entradas de suporte: ", operationFailed)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ClienteMenu, "Falha ao carregar entradas: ${operationFailed.message}", Toast.LENGTH_LONG).show()
+                }
             }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Erro ao buscar chamados: ", exception)
-                Toast.makeText(this, "Erro ao carregar chamados: ${exception.message}", Toast.LENGTH_LONG).show()
-            }
+        }
     }
 }
